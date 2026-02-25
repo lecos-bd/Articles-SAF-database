@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Artigos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Sistema de Consulta de Artigos</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="POST" class="row g-3">
+                <div class="col-md-9">
+                    <input type="text" name="busca" class="form-control" placeholder="Digite o título ou palavra-chave..." required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Consultar Artigos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if grafico %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white"><strong>Visualização de Dados</strong></div>
+        <div class="card-body">
+            {{ grafico | safe }}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white"><strong>Resultados da Pesquisa</strong></div>
+        <div class="card-body">
+            {% if artigos %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Ano</th>
+                            <th>Revista</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for artigo in artigos %}
+                        <tr>
+                            <td>{{ artigo.titulo }}</td>
+                            <td>{{ artigo.autor }}</td>
+                            <td>{{ artigo.ano }}</td>
+                            <td>{{ artigo.revista }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center">Nenhum resultado encontrado ou aguardando consulta.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

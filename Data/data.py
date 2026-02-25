@@ -1,49 +1,15 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import os
 
-def load_data(file_path):
-    df = pd.read_excel(file_path)
-    return df
+# Caminho dinâmico para o Excel na raiz do projeto
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+EXCEL_PATH = os.path.join(BASE_DIR, '..', 'artigos.xlsx')
 
-def get_DOI(df):
-    return df['DI'].unique()
+def carregar_dados():
+    return pd.read_excel(EXCEL_PATH)
 
-def get_ano(df):
-    return df['PY'].unique()
-
-def get_journal(df):
-    return df['JO'].unique()
-
-def get_title(df):
-    return df['TI'].unique()
-
-def get_abstract(df):
-    return df['AB'].unique()
-
-def get_keywords(df):
-    return df['DE'].unique()
-
-def get_citations(df):
-    return df['TC'].unique()
-
-def get_references(df):
-    return df['CR'].unique()
-
-def get_authors(df):
-    return df['AU'].unique()
-
-def get_affiliations(df):
-    return df['AF'].unique()
-
-def get_bd(df):
-    return df['BD'].unique()
-
-def get_source(df):
-    return df['SO'].unique()
-
-def get_escopo(df):
-    return df['COMBINACAO_EIXOS']
-
-if __name__ == "__main__":
-    df = load_data("Todos os Artigos.xlsx")
+def consultar_artigos(termo):
+    df = carregar_dados()
+    # Filtro simples por título
+    resultado = df[df['titulo'].str.contains(termo, case=False, na=False)]
+    return resultado.to_dict(orient='records')
