@@ -1,31 +1,37 @@
-import sys
 import os
+import sys
 from flask import Flask, render_template, request
 
-# Ajuste para importar de pastas diferentes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Configuração de caminhos (mantendo sua estrutura)
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(APP_DIR)
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
 from Data import data
-import plot  # plot.py está na mesma pasta (App)
-
-# Indicamos ao Flask onde está a pasta Templates e os arquivos estáticos
-app = Flask(__name__, template_folder="../Templates")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    resultados = []
-    grafico_html = ""
-    
-    if request.method == 'POST':
-        termo = request.form.get('busca')
-        # Busca os dados usando o módulo na pasta Data
-        resultados = data.consultar_artigos(termo)
-        
-        # Opcional: Gerar gráfico
-        # import pandas as pd
-        # grafico_html = plot.gerar_grafico_ano(pd.DataFrame(resultados))
+    opcoes_filtros = data.obter_valores_unicos()
+    resultados = None # Iniciamos como None para diferenciar "página limpa" de "nenhum resultado"
+    erro_validacao = False
 
-    return render_template('index.html', artigos=resultados, grafico=grafico_html)
+    if request.method == 'POST':
+        # Captura os filtros ignorando campos vazios
+        filtros_selecionados = {col: request.form.get(col) for col in opcoes_filtros.keys() if request.form.get(col)}
+        
+        # Validação: Pelo menos um filtro deve estar preenchido
+        if filtros_selecionados:
+            resultados = data.consultar_artigos_filtrados(filtros_selecionados)
+        else:
+            erro_validacao = True # Ativa o aviso de que é necessário selecionar algo
+            
+    return render_template('index.html', filtros=opcoes_filtros, artigos=resultados, erro=erro_validacao)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
